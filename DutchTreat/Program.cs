@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DutchTreat.Data;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -12,31 +15,62 @@ namespace DutchTreat
 {
     public class Program
     {
-        public static void Main(string[] args)
+        //public static void Main(string[] args)
+        //{
+        //    //CreateHostBuilder(args).Build().Run();
+        //    BuildWebHost(args).Run();
+        //}
+
+        //private static IWebHost BuildWebHost(string[] args) =>
+        //    WebHost.CreateDefaultBuilder(args)
+        //    .ConfigureAppConfiguration(SetupConfiguration)
+        //    .UseStartup<Startup>()
+        //    .Build();
+
+        //private static void SetupConfiguration(WebHostBuilderContext ctx, IConfigurationBuilder builder)
+        //{
+        //    //Removing all default configuration options.
+        //    builder.Sources.Clear();
+        //    builder.AddJsonFile("appsettings.json", false, true)
+        //           //.AddXmlFile("config.xml", true)
+        //           .AddEnvironmentVariables();
+        //}
+
+        public static void Main(string [] args)
         {
-            //CreateHostBuilder(args).Build().Run();
-            BuildWebHost(args).Run();
+            var host = CreateHostBuilder(args).Build();
+
+            // migrate the database.  Best practice = in Main, using service scope
+
+
+            using (var scope = host.Services.CreateScope())
+            {
+                try
+                {
+                    var context = scope.ServiceProvider.GetService<DutchSeeder>();
+                    //// for demo purposes, delete the database & migrate on startup so 
+                    //// we can start with a clean slate
+                    //context.Database.EnsureDeleted();
+                    //context.Database.Migrate();
+                    context.Seed();
+
+                }
+                catch (Exception ex)
+                {
+                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred while migrating the database.");
+                }
+            }
+
+            // run the web app
+            host.Run();
         }
 
-        private static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration(SetupConfiguration)
-            .UseStartup<Startup>()
-            .Build();
-
-        private static void SetupConfiguration(WebHostBuilderContext ctx, IConfigurationBuilder builder)
-        {
-            //Removing all default configuration options.
-            builder.Sources.Clear();
-            builder.AddJsonFile("appsettings.json", false, true)
-                   .AddEnvironmentVariables();
-        }
-
-        //public static IHostBuilder CreateHostBuilder(string[] args) =>
-        //    Host.CreateDefaultBuilder(args)
-        //        .ConfigureWebHostDefaults(webBuilder =>
-        //        {
-        //            webBuilder.UseStartup<Startup>();   
-        //        });
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
     }
 }

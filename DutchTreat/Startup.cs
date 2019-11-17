@@ -24,26 +24,28 @@ namespace DutchTreat
             _config = config;
         }
 
-
+        public IConfiguration Configuration { get; }
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<DutchContext>();
+            //services.AddDbContext<DutchContext>();
             //EF Configuration
-            services.AddDbContextPool<DutchContext>(
+            services.AddControllers();
+            services.AddDbContext<DutchContext>(
                 cfg => cfg.UseSqlServer(_config.GetConnectionString("DutchConnectionString")));
 
-
+            services.AddTransient<DutchSeeder>();
+            services.AddScoped<IDutchRepository, DutchRepository>();
             services.AddTransient<IMailService, NullMailService>();
             //Support for real mail service
             //We can add 3 types to add services
-            //1. services.AddTransient  ==It dont have any data on themselfs, just messgae to do things,
-            //2. services.AddScoped ==It is for adding services that are a liitle bit more expensive to create.
+            //1.services.AddTransient == It dont have any data on themselfs, just messgae to do things,
+            //2.services.AddScoped == It is for adding services that are a liitle bit more expensive to create.
             //They are actually kept on different scopes but default scope is ASP.net core project.
-            //3.services.AddTransient   ==Needed for the services that are created once and are kept for the lifetime of the server being up.
+            //3.services.AddTransient == Needed for the services that are created once and are kept for the lifetime of the server being up.
 
-            services.AddMvc();            
+           services.AddMvc();            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,7 +63,7 @@ namespace DutchTreat
             //    cfg.MapRoute("Default", "{controller}/{action}/{id?}",
             //        new { Controller = "App", Action = "Index" });
             //});
-
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 //endpoints.MapGet("/", async context => 
