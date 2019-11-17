@@ -45,7 +45,8 @@ namespace DutchTreat
             //They are actually kept on different scopes but default scope is ASP.net core project.
             //3.services.AddTransient == Needed for the services that are created once and are kept for the lifetime of the server being up.
 
-           services.AddMvc();            
+            services.AddMvc();
+           //     AddJsonOptions(opt=>opt.JsonSerializerOptions = )            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

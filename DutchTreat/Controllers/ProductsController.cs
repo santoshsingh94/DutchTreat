@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 namespace DutchTreat.Controllers
 {
     [Route("api/[Controller]")]
+    [ApiController]
+    [Produces("application/json")]
     public class ProductsController : Controller
     {
         private readonly IDutchRepository _repository;
@@ -21,9 +23,19 @@ namespace DutchTreat.Controllers
             _logger = logger;
         }
         [HttpGet]
-        public IEnumerable<Product> Get()
+        [ProducesResponseType(200)]
+
+        public ActionResult<IEnumerable<Product>> Get()
         {
-            return _repository.GetAllProducts();
+            try
+            {
+                return Ok(_repository.GetAllProducts());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to get poducts : {ex}");
+                return BadRequest("Failed to get Products");
+            }
         }
     }
 }

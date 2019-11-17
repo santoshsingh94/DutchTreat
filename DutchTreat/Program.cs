@@ -15,27 +15,7 @@ namespace DutchTreat
 {
     public class Program
     {
-        //public static void Main(string[] args)
-        //{
-        //    //CreateHostBuilder(args).Build().Run();
-        //    BuildWebHost(args).Run();
-        //}
-
-        //private static IWebHost BuildWebHost(string[] args) =>
-        //    WebHost.CreateDefaultBuilder(args)
-        //    .ConfigureAppConfiguration(SetupConfiguration)
-        //    .UseStartup<Startup>()
-        //    .Build();
-
-        //private static void SetupConfiguration(WebHostBuilderContext ctx, IConfigurationBuilder builder)
-        //{
-        //    //Removing all default configuration options.
-        //    builder.Sources.Clear();
-        //    builder.AddJsonFile("appsettings.json", false, true)
-        //           //.AddXmlFile("config.xml", true)
-        //           .AddEnvironmentVariables();
-        //}
-
+        
         public static void Main(string [] args)
         {
             var host = CreateHostBuilder(args).Build();
